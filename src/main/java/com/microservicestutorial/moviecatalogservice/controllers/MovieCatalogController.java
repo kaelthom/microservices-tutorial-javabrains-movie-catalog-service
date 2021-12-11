@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,9 @@ public class MovieCatalogController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private WebClient.Builder builder;
+
     @GetMapping(value = "/{id}")
     public MovieCatalogResource getMoviesById(@PathVariable(value = "id") String userId) {
 
@@ -35,7 +39,13 @@ public class MovieCatalogController {
 
         List<MovieRatingResource> movies = moviesRates.stream()
                 .map(moviesRate -> {
-                    MovieInfoResource movieInfoResource = restTemplate.getForObject("http://localhost:8081/movie/" + moviesRate.getMovieId(), MovieInfoResource.class);
+                    // MovieInfoResource movieInfoResource = restTemplate.getForObject("http://localhost:8081/movie/" + moviesRate.getMovieId(), MovieInfoResource.class);
+                    MovieInfoResource movieInfoResource = builder.build()
+                            .get()
+                            .uri("http://localhost:8081/movie/" + moviesRate.getMovieId())
+                            .retrieve()
+                            .bodyToMono(MovieInfoResource.class)
+                            .block(); // block means we wait the response to make the service synchronous. If we want it asynchronous we have to return a Mono in the controller
                     return new MovieRatingResource(movieInfoResource.getId(), moviesRate.getRate(), movieInfoResource.getName(), movieInfoResource.getDescription());
                 })
                 .collect(Collectors.toList());
