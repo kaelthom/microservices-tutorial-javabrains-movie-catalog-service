@@ -1,9 +1,11 @@
 package com.microservicestutorial.moviecatalogservice.controllers;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
 import com.microservicestutorial.moviecatalogservice.resources.MovieCatalogResource;
 import com.microservicestutorial.moviecatalogservice.resources.MovieInfoResource;
 import com.microservicestutorial.moviecatalogservice.resources.MovieRatingResource;
 import com.microservicestutorial.moviecatalogservice.resources.RatingResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +21,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/catalog")
 public class MovieCatalogController {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @GetMapping(value = "/{id}")
     public MovieCatalogResource getMoviesById(@PathVariable(value = "id") String userId) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         List<RatingResource> moviesRates = Arrays.asList(
                 new RatingResource(0, 4),
