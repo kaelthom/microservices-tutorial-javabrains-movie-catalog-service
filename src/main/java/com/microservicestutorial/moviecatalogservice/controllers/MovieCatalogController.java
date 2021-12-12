@@ -1,10 +1,7 @@
 package com.microservicestutorial.moviecatalogservice.controllers;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
-import com.microservicestutorial.moviecatalogservice.resources.MovieCatalogResource;
-import com.microservicestutorial.moviecatalogservice.resources.MovieInfoResource;
-import com.microservicestutorial.moviecatalogservice.resources.MovieRatingResource;
-import com.microservicestutorial.moviecatalogservice.resources.RatingResource;
+import com.microservicestutorial.moviecatalogservice.resources.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,21 +28,11 @@ public class MovieCatalogController {
     @GetMapping(value = "/{id}")
     public MovieCatalogResource getMoviesById(@PathVariable(value = "id") String userId) {
 
-        List<RatingResource> moviesRates = Arrays.asList(
-                new RatingResource(0, 4),
-                new RatingResource(1, 3),
-                new RatingResource(2, 5)
-        );
+        UserRatingsResource userRatingsResource = restTemplate.getForObject("http://localhost:8083/movie-rating/user/" + userId, UserRatingsResource.class);
 
-        List<MovieRatingResource> movies = moviesRates.stream()
+        List<MovieRatingResource> movies = userRatingsResource.getRatings().stream()
                 .map(moviesRate -> {
-                    // MovieInfoResource movieInfoResource = restTemplate.getForObject("http://localhost:8081/movie/" + moviesRate.getMovieId(), MovieInfoResource.class);
-                    MovieInfoResource movieInfoResource = builder.build()
-                            .get()
-                            .uri("http://localhost:8081/movie/" + moviesRate.getMovieId())
-                            .retrieve()
-                            .bodyToMono(MovieInfoResource.class)
-                            .block(); // block means we wait the response to make the service synchronous. If we want it asynchronous we have to return a Mono in the controller
+                    MovieInfoResource movieInfoResource = restTemplate.getForObject("http://localhost:8081/movie/" + moviesRate.getMovieId(), MovieInfoResource.class);
                     return new MovieRatingResource(movieInfoResource.getId(), moviesRate.getRate(), movieInfoResource.getName(), movieInfoResource.getDescription());
                 })
                 .collect(Collectors.toList());

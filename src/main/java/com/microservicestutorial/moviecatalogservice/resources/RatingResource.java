@@ -4,6 +4,9 @@ public class RatingResource {
     private int movieId;
     private int rate;
 
+    public RatingResource() {
+    }
+
     public RatingResource(int movieId, int rate) {
         this.movieId = movieId;
         this.rate = rate;

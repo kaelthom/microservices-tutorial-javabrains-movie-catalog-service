@@ -6,6 +6,9 @@ public class MovieRatingResource {
     String name;
     String description;
 
+    public MovieRatingResource() {
+    }
+
     public MovieRatingResource(int id, int rate, String name, String description) {
         this.id = id;
         this.rate = rate;
