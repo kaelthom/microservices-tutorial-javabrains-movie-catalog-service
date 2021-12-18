@@ -3,16 +3,16 @@ package com.microservicestutorial.moviecatalogservice.resources;
 public class MovieInfoResource {
 
     private int id;
-    private String name;
-    private String description;
+    private String original_title;
+    private String overview;
 
     public MovieInfoResource() {
     }
 
-    public MovieInfoResource(int id, String name, String description) {
+    public MovieInfoResource(int id, String originalTitle, String description) {
         this.id = id;
-        this.name = name;
-        this.description = description;
+        this.original_title = originalTitle;
+        this.overview = description;
     }
 
     public int getId() {
@@ -23,19 +23,19 @@ public class MovieInfoResource {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getOriginal_title() {
+        return original_title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOriginal_title(String original_title) {
+        this.original_title = original_title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getOverview() {
+        return overview;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 }

@@ -37,7 +37,7 @@ public class MovieCatalogController {
         List<MovieRatingResource> movies = userRatingsResource.getRatings().stream()
                 .map(moviesRate -> {
                     MovieInfoResource movieInfoResource = restTemplate.getForObject("http://movie-info-api/movie/" + moviesRate.getMovieId(), MovieInfoResource.class);
-                    return new MovieRatingResource(movieInfoResource.getId(), moviesRate.getRate(), movieInfoResource.getName(), movieInfoResource.getDescription());
+                    return new MovieRatingResource(movieInfoResource.getId(), moviesRate.getRate(), movieInfoResource.getOriginal_title(), movieInfoResource.getOverview());
                 })
                 .collect(Collectors.toList());
 
