@@ -41,8 +41,6 @@ public class MovieCatalogController {
                 })
                 .collect(Collectors.toList());
 
-        System.out.println("instances : " + discoveryClient.getInstances("movie-ratings-api"));
-        System.out.println("services : " + discoveryClient.getServices());
         return new MovieCatalogResource(userId, "Mika T", movies);
     }
 }
