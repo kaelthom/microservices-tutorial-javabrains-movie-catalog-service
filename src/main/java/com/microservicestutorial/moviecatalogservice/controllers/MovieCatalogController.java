@@ -4,6 +4,7 @@ import com.microservicestutorial.moviecatalogservice.resources.MovieCatalogResou
 import com.microservicestutorial.moviecatalogservice.resources.MovieInfoResource;
 import com.microservicestutorial.moviecatalogservice.resources.MovieRatingResource;
 import com.microservicestutorial.moviecatalogservice.resources.UserRatingsResource;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ public class MovieCatalogController {
     private WebClient.Builder builder;
 
     @GetMapping(value = "/{id}")
+    @HystrixCommand(fallbackMethod = "getMoviesByIdFallback")
     public MovieCatalogResource getMoviesById(@PathVariable(value = "id") String userId) {
 
         UserRatingsResource userRatingsResource = restTemplate.getForObject("http://movie-ratings-api/movie-rating/user/" + userId, UserRatingsResource.class);
@@ -42,5 +45,10 @@ public class MovieCatalogController {
                 .collect(Collectors.toList());
 
         return new MovieCatalogResource(userId, "Mika T", movies);
+    }
+
+    @FallbackMethod
+    public MovieCatalogResource getMoviesByIdFallback(@PathVariable(value = "id") String userId) {
+        return new MovieCatalogResource("-1", "No user found", new ArrayList<>());
     }
 }
