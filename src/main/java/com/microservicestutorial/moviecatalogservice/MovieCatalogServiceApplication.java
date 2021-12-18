@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 @EnableEurekaClient // not mandatory
-@EnableCircuitBreaker
+@EnableCircuitBreaker //Use Resilience4j instead
 public class MovieCatalogServiceApplication {
 
     /**
