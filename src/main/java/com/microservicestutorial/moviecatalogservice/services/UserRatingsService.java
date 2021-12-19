@@ -4,6 +4,7 @@ import com.microservicestutorial.moviecatalogservice.controllers.FallbackMethod;
 import com.microservicestutorial.moviecatalogservice.resources.RatingResource;
 import com.microservicestutorial.moviecatalogservice.resources.UserRatingsResource;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +17,14 @@ public class UserRatingsService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @HystrixCommand(fallbackMethod = "getUserRatingsFallback")
+    @HystrixCommand(fallbackMethod = "getUserRatingsFallback", commandProperties =
+            {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "10000"),
+            }
+    )
     public UserRatingsResource getUserRatings(String userId) {
         return restTemplate.getForObject("http://movie-ratings-api/movie-rating/user/" + userId, UserRatingsResource.class);
     }
