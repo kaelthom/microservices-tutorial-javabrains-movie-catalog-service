@@ -1,6 +1,11 @@
 package com.microservicestutorial.moviecatalogservice.controllers;
 
-import com.microservicestutorial.moviecatalogservice.resources.*;
+import com.microservicestutorial.moviecatalogservice.resources.MovieCatalogResource;
+import com.microservicestutorial.moviecatalogservice.resources.MovieInfoResource;
+import com.microservicestutorial.moviecatalogservice.resources.MovieRatingResource;
+import com.microservicestutorial.moviecatalogservice.resources.UserRatingsResource;
+import com.microservicestutorial.moviecatalogservice.services.MovieInfoService;
+import com.microservicestutorial.moviecatalogservice.services.UserRatingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +29,10 @@ public class MovieCatalogController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private MovieCatalogFallbackService movieCatalogFallbackService;
+    private UserRatingsService userRatingsService;
+
+    @Autowired
+    private MovieInfoService movieInfoService;
 
     @Autowired
     private WebClient.Builder builder;
@@ -32,11 +40,11 @@ public class MovieCatalogController {
     @GetMapping(value = "/{id}")
     public MovieCatalogResource getMoviesById(@PathVariable(value = "id") String userId) {
 
-        UserRatingsResource userRatingsResource = movieCatalogFallbackService.getUserRatings(userId);
+        UserRatingsResource userRatingsResource = userRatingsService.getUserRatings(userId);
 
         List<MovieRatingResource> movies = userRatingsResource.getRatings().stream()
                 .map(moviesRate -> {
-                    MovieInfoResource movieInfoResource = movieCatalogFallbackService.getMovieInfoResource(moviesRate);
+                    MovieInfoResource movieInfoResource = movieInfoService.getMovieInfoResource(moviesRate);
                     return new MovieRatingResource(movieInfoResource.getId(), moviesRate.getRate(), movieInfoResource.getOriginal_title(), movieInfoResource.getOverview());
                 })
                 .collect(Collectors.toList());
